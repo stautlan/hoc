@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css'
 
 function YearTable(props) {
@@ -93,9 +93,29 @@ function withDataProcessing(WrappedComponent) {
 }
 
 function App() {
+//  export default class App extends React.Component {
   const [state, setState] = useState({
     list: []
   })
+
+  const fetchLists = async() => {
+    try {
+      debugger
+      const responce = await fetch(`https://raw.githubusercontent.com/netology-code/ra16-homeworks/master/hoc/aggregation/data/data.json`)
+      if (!responce.ok) {
+        throw new Error('Ошибка сервера')
+      }
+  
+      const data = await responce.json();
+      setState(data);
+    } catch(error) {
+      console.log(error)
+    }
+  }
+
+  useEffect(() => {
+    fetchLists();
+  }, [])
 
   // Обертка компонента YearTable
   const YearTableWithProcessing = withDataProcessing(YearTable);
@@ -107,11 +127,11 @@ function App() {
   const SortTableWithProcessing = withDataProcessing(SortTable);
 
   return (
-    <>
+    <div>
       <MonthTableWithProcessing list={state.list} />
       <YearTableWithProcessing list={state.list} />
       <SortTableWithProcessing list={state.list} />
-    </>
+    </div>
   )
 }
 
